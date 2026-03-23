@@ -1,5 +1,6 @@
 package com.portfolio.portfolio.controller;
 
+import com.portfolio.portfolio.dto.ChangePasswordRequest;
 import com.portfolio.portfolio.dto.PortfolioResponse;
 import com.portfolio.portfolio.model.Profile;
 import com.portfolio.portfolio.model.ProjectLink;
@@ -31,6 +32,16 @@ public class PortfolioController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void authCheck(@RequestHeader(value = "X-Admin-Password", required = false) String adminPassword) {
         adminAuthService.verifyOrThrow(adminPassword);
+    }
+
+    @PostMapping("/admin/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(
+            @RequestHeader(value = "X-Admin-Password", required = false) String adminPassword,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        adminAuthService.verifyOrThrow(adminPassword);
+        adminAuthService.changePassword(request.getOldPassword(), request.getNewPassword());
     }
 
     @PutMapping("/admin/profile")

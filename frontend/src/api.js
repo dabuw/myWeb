@@ -59,3 +59,13 @@ export async function deleteProject(password, id) {
     method: 'DELETE'
   });
 }
+
+export async function changeAdminPassword(password, oldPassword, newPassword) {
+  return adminFetch('/api/admin/change-password', password, {
+    method: 'POST',
+    body: JSON.stringify({
+      oldPassword,
+      newPassword
+    })
+  });
+}

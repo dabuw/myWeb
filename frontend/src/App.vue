@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import {
+  changeAdminPassword,
   checkAdminPassword,
   createProject,
   deleteProject,
@@ -21,6 +22,11 @@ const authError = ref('');
 const isAuthenticated = ref(false);
 const actionMessage = ref('');
 const actionError = ref('');
+const passwordForm = ref({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+});
 
 const profileForm = ref({
   fullName: '',
@@ -105,6 +111,39 @@ function handleLogout() {
   isAuthenticated.value = false;
   actionMessage.value = '';
   actionError.value = '';
+}
+
+async function handlePasswordChange() {
+  actionMessage.value = '';
+  actionError.value = '';
+
+  if (passwordForm.value.newPassword.length < 8) {
+    actionError.value = '新密码长度至少为 8 位';
+    return;
+  }
+  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    actionError.value = '两次输入的新密码不一致';
+    return;
+  }
+
+  try {
+    await changeAdminPassword(
+      adminPassword.value,
+      passwordForm.value.oldPassword,
+      passwordForm.value.newPassword
+    );
+
+    adminPassword.value = passwordForm.value.newPassword;
+    sessionStorage.setItem('admin_password', passwordForm.value.newPassword);
+    passwordForm.value = {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+    actionMessage.value = '管理密码已更新，并已自动切换为新密码会话';
+  } catch (e) {
+    actionError.value = e.message;
+  }
 }
 
 async function handleProfileSave() {
@@ -276,6 +315,31 @@ onMounted(async () => {
             <textarea class="input textarea" v-model="profileForm.summary" placeholder="个人简介"></textarea>
           </div>
           <button class="btn" @click="handleProfileSave">保存资料</button>
+        </section>
+
+        <section class="card">
+          <h3>修改管理密码</h3>
+          <div class="form-grid">
+            <input
+              class="input"
+              type="password"
+              v-model="passwordForm.oldPassword"
+              placeholder="旧密码"
+            />
+            <input
+              class="input"
+              type="password"
+              v-model="passwordForm.newPassword"
+              placeholder="新密码（至少 8 位）"
+            />
+            <input
+              class="input"
+              type="password"
+              v-model="passwordForm.confirmPassword"
+              placeholder="确认新密码"
+            />
+          </div>
+          <button class="btn" @click="handlePasswordChange">更新密码</button>
         </section>
 
         <section class="card">

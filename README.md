@@ -4,7 +4,7 @@
 
 - 公开展示页（个人资料 + 项目列表）
 - 后台管理页（`/myself`）
-- 管理密码校验（后端接口级保护）
+- 管理密码校验（数据库 BCrypt + 后端接口级保护）
 - 本地开发与 Docker 部署
 
 ## 1. 技术栈
@@ -30,6 +30,7 @@
 ### 3.2 管理接口（需要 `X-Admin-Password`）
 
 - `GET /api/admin/auth-check`：校验管理密码
+- `POST /api/admin/change-password`：修改管理密码
 - `PUT /api/admin/profile`：修改个人资料（`profiles`）
 - `POST /api/admin/projects`：新增项目（`project_links`）
 - `PUT /api/admin/projects/{id}`：更新项目
@@ -41,6 +42,7 @@
 - 登录方式：输入管理密码
 - 可操作内容：
 	- 修改姓名、邮箱、职位、简介、GitHub、LinkedIn 等
+	- 在线修改管理密码（无需重启后端）
 	- 新增/编辑/删除项目
 	- 调整 `displayOrder` 控制展示顺序
 
@@ -63,9 +65,14 @@ Copy-Item .env.example .env
 - `SPRING_PROFILES_ACTIVE`：`local` 或 `cloud`
 - `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USERNAME` / `DB_PASSWORD`
 - `DB_USE_SSL`：云数据库通常按实际配置
-- `ADMIN_PASSWORD`：后台登录密码
 - `CORS_ALLOWED_ORIGIN`：允许访问后端的前端地址
 - `VITE_API_BASE_URL`：前端打包时注入的后端 API 地址
+
+管理员密码说明：
+
+- 管理密码存储于数据库表 `admin_users`（字段 `password_hash`）
+- 后端使用 BCrypt 校验与更新密码哈希
+- 首次部署前请先在数据库初始化管理员账号
 
 ## 5. 本地开发（不使用 Docker）
 
@@ -77,7 +84,6 @@ $env:SPRING_PROFILES_ACTIVE="local"
 $env:SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/portfolio_site?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8"
 $env:SPRING_DATASOURCE_USERNAME="root"
 $env:SPRING_DATASOURCE_PASSWORD="123456"
-$env:ADMIN_PASSWORD="你的管理密码"
 mvn spring-boot:run
 ```
 
@@ -114,7 +120,7 @@ docker compose down
 
 ## 7. Docker 云部署（外部 MySQL）
 
-1. 准备 `.env`（参考 `.env.example`，填写云数据库与管理密码）
+1. 准备 `.env`（参考 `.env.example`，填写云数据库配置）
 2. 启动：
 
 ```bash
@@ -151,7 +157,7 @@ git push -u origin main
 
 ## 9. 部署前检查清单
 
-- 已修改 `ADMIN_PASSWORD`，不是默认值
+- `admin_users` 已存在管理员账号且密码哈希有效
 - 云数据库已开放应用服务器 IP 白名单
 - `CORS_ALLOWED_ORIGIN` 与实际前端域名一致
 - `VITE_API_BASE_URL` 指向可访问的后端地址
