@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: portfolio-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USE_SSL: ${DB_USE_SSL:-false}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    container_name: portfolio-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend

@@ -1,0 +1,15 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  profiles:
+    default: local
+  jpa:
+    open-in-view: false
+    show-sql: false
+
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+  admin:
+    password: ${ADMIN_PASSWORD:ljn38642099}

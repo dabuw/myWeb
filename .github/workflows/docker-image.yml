@@ -1,0 +1,46 @@
+name: Build Docker Images
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build backend jar
+        run: mvn -f backend/pom.xml -DskipTests package
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build frontend static files
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Build backend image
+        run: docker build -t portfolio-backend:latest backend
+
+      - name: Build frontend image
+        run: docker build -t portfolio-frontend:latest frontend
+
+      - name: Export image tags
+        run: |
+          echo "Built images:"
+          echo "portfolio-backend:latest"
+          echo "portfolio-frontend:latest"

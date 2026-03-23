@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: portfolio-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: portfolio_site
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    container_name: portfolio-backend
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: portfolio_site
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      CORS_ALLOWED_ORIGIN: http://localhost:8081
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: portfolio-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

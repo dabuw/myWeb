@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: cloud
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useSSL=${DB_USE_SSL:true}&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: never
+
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN}
