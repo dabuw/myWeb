@@ -121,6 +121,7 @@ docker compose down
 ## 7. Docker 云部署（外部 MySQL）
 
 1. 准备 `.env`（参考 `.env.example`，填写云数据库配置）
+	- 默认前端端口为 `8082`（避免与常见 Redis 管理工具 `8081` 冲突）
 2. 启动：
 
 ```bash
@@ -138,6 +139,11 @@ docker compose -f docker-compose.cloud.yml logs -f
 ```bash
 docker compose -f docker-compose.cloud.yml down
 ```
+
+云部署访问：
+
+- 前端：`http://<服务器IP>:8082`
+- 后端：`http://<服务器IP>:8080`
 
 ## 8. 推送到 Gitee（建议流程）
 
