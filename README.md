@@ -145,23 +145,7 @@ docker compose -f docker-compose.cloud.yml down
 - 前端：`http://<服务器IP>:8082`
 - 后端：`http://<服务器IP>:8080`
 
-## 8. 推送到 Gitee（建议流程）
-
-```bash
-git init
-git add .
-git commit -m "init: portfolio project"
-git branch -M main
-git remote add origin <你的Gitee仓库地址>
-git push -u origin main
-```
-
-建议在 Gitee 配置：
-
-- 忽略 `.env`（仓库已通过 `.gitignore` 处理）
-- 使用部署机上的 `.env` 管理真实密码和数据库地址
-
-## 9. 部署前检查清单
+## 8. 部署前检查清单
 
 - `admin_users` 已存在管理员账号且密码哈希有效
 - 云数据库已开放应用服务器 IP 白名单
