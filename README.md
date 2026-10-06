@@ -65,8 +65,8 @@ Copy-Item .env.example .env
 - `SPRING_PROFILES_ACTIVE`：`local` 或 `cloud`
 - `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USERNAME` / `DB_PASSWORD`
 - `DB_USE_SSL`：云数据库通常按实际配置
-- `CORS_ALLOWED_ORIGIN`：允许访问后端的前端地址
-- `VITE_API_BASE_URL`：前端打包时注入的后端 API 地址
+- `CORS_ALLOWED_ORIGIN`：允许访问后端的前端地址；生产环境填写实际域名，例如 `https://dabuw.online`
+- `VITE_API_BASE_URL`：前端打包时注入的后端 API 地址。生产环境应留空，前端 Nginx 会将同域 `/api` 转发到后端，避免跨域与 HTTPS 混合内容错误
 
 管理员密码说明：
 
@@ -122,6 +122,8 @@ docker compose down
 
 1. 准备 `.env`（参考 `.env.example`，填写云数据库配置）
 	- 默认前端端口为 `8082`（避免与常见 Redis 管理工具 `8081` 冲突）
+	- 域名为 `dabuw.online` 且已配置 HTTPS 时，设置 `CORS_ALLOWED_ORIGIN=https://dabuw.online`
+	- 设置 `VITE_API_BASE_URL=`（留空）。不要填写服务器 IP 或 `http://...:8080`
 2. 启动：
 
 ```bash
@@ -145,10 +147,31 @@ docker compose -f docker-compose.cloud.yml down
 - 前端：`http://<服务器IP>:8082`
 - 后端：`http://<服务器IP>:8080`
 
+### 7.1 域名部署
+
+将服务器上的站点配置反向代理到前端容器端口（本例为 `8082`）。域名入口不需要、也不应直接暴露后端 `8080` 端口：
+
+```nginx
+server {
+  listen 80;
+  server_name dabuw.online www.dabuw.online;
+
+  location / {
+    proxy_pass http://127.0.0.1:8082;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+```
+
+配置 HTTPS 后，将 `listen 80` 改为证书对应的 HTTPS 站点配置，并保持同样的 `proxy_pass`。容器中的前端 Nginx 会把浏览器访问的 `/api/...` 自动转发给后端。
+
 ## 8. 部署前检查清单
 
 - `admin_users` 已存在管理员账号且密码哈希有效
 - 云数据库已开放应用服务器 IP 白名单
 - `CORS_ALLOWED_ORIGIN` 与实际前端域名一致
-- `VITE_API_BASE_URL` 指向可访问的后端地址
+- `VITE_API_BASE_URL` 留空，确保 API 通过同域 `/api` 访问
 - 本项目默认不再自动插入 `data.sql` 初始化数据

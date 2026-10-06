@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+// In Docker deployments, Nginx proxies this path to the backend so requests
+// stay on the same origin as the site.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
 export async function fetchPortfolio() {
   const response = await fetch(`${API_BASE}/api/public/portfolio`);
