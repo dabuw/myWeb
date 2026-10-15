@@ -35,6 +35,7 @@
 - `POST /api/admin/projects`：新增项目（`project_links`）
 - `PUT /api/admin/projects/{id}`：更新项目
 - `DELETE /api/admin/projects/{id}`：删除项目
+- `POST /api/admin/projects/{id}/delete`：删除项目（兼容某些云代理限制 `DELETE` 方法）
 
 ### 3.3 管理页面
 
