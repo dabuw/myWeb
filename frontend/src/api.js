@@ -10,6 +10,21 @@ export async function fetchPortfolio() {
   return response.json();
 }
 
+/**
+ * 从错误响应里取出后端给的提示语。
+ * 后端在 401 / 429 等响应里会带 { message: "..." }（见 GlobalExceptionHandler），
+ * 取到就用它，前端才能显示「登录尝试次数过多，请在 X 分钟后重试」这类具体原因。
+ */
+async function readErrorMessage(response) {
+  try {
+    const body = await response.clone().json();
+    const message = body?.message;
+    return typeof message === 'string' ? message.trim() : '';
+  } catch {
+    return '';
+  }
+}
+
 async function adminFetch(path, password, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -21,7 +36,8 @@ async function adminFetch(path, password, options = {}) {
   });
 
   if (!response.ok) {
-    throw new Error(`管理接口请求失败: ${response.status}`);
+    const message = await readErrorMessage(response);
+    throw new Error(message || `管理接口请求失败: ${response.status}`);
   }
 
   if (response.status === 204) {

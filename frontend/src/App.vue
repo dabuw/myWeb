@@ -151,8 +151,9 @@ async function handleLogin() {
     await checkAdminPassword(adminPassword.value);
     sessionStorage.setItem('admin_password', adminPassword.value);
     isAuthenticated.value = true;
-  } catch {
-    authError.value = '密码错误，请重试';
+  } catch (e) {
+    // 被限流时后端会返回 429 并带上具体提示，优先显示它
+    authError.value = e?.message || '密码错误，请重试';
     isAuthenticated.value = false;
   } finally {
     authLoading.value = false;

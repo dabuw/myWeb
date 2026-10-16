@@ -11,3 +11,8 @@ spring:
 app:
   cors:
     allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+  admin:
+    # 管理接口登录失败限流：同一来源 IP 在窗口内最多失败几次，窗口长度（分钟）。
+    # 默认 5 次 / 60 分钟。改这两个值需要重新构建后端镜像。
+    login-max-attempts: 5
+    login-window-minutes: 60
