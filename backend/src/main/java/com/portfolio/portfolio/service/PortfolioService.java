@@ -49,6 +49,8 @@ public class PortfolioService {
         existing.setName(projectLink.getName());
         existing.setUrl(projectLink.getUrl());
         existing.setDescription(projectLink.getDescription());
+        existing.setNameEn(projectLink.getNameEn());
+        existing.setDescriptionEn(projectLink.getDescriptionEn());
         existing.setHighlight(projectLink.getHighlight());
         existing.setDisplayOrder(projectLink.getDisplayOrder());
 

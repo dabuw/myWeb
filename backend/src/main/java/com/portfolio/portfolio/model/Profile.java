@@ -33,6 +33,21 @@ public class Profile {
     @Column(length = 255)
     private String linkedinUrl;
 
+    // --- English translations (nullable: the English page falls back to the
+    // Chinese value when a field is left empty) ---
+
+    @Column(length = 100)
+    private String fullNameEn;
+
+    @Column(length = 120)
+    private String titleEn;
+
+    @Column(length = 1600)
+    private String summaryEn;
+
+    @Column(length = 120)
+    private String locationEn;
+
     public Long getId() {
         return id;
     }
@@ -95,5 +110,37 @@ public class Profile {
 
     public void setLinkedinUrl(String linkedinUrl) {
         this.linkedinUrl = linkedinUrl;
+    }
+
+    public String getFullNameEn() {
+        return fullNameEn;
+    }
+
+    public void setFullNameEn(String fullNameEn) {
+        this.fullNameEn = fullNameEn;
+    }
+
+    public String getTitleEn() {
+        return titleEn;
+    }
+
+    public void setTitleEn(String titleEn) {
+        this.titleEn = titleEn;
+    }
+
+    public String getSummaryEn() {
+        return summaryEn;
+    }
+
+    public void setSummaryEn(String summaryEn) {
+        this.summaryEn = summaryEn;
+    }
+
+    public String getLocationEn() {
+        return locationEn;
+    }
+
+    public void setLocationEn(String locationEn) {
+        this.locationEn = locationEn;
     }
 }

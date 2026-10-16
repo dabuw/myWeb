@@ -82,14 +82,4 @@ public class PortfolioController {
         adminAuthService.verifyOrThrow(adminPassword);
         portfolioService.deleteProject(id);
     }
-
-    @PostMapping("/admin/projects/{id}/delete")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProjectFallback(
-            @RequestHeader(value = "X-Admin-Password", required = false) String adminPassword,
-            @PathVariable Long id
-    ) {
-        adminAuthService.verifyOrThrow(adminPassword);
-        portfolioService.deleteProject(id);
-    }
 }

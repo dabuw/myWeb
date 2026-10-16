@@ -9,6 +9,15 @@ import {
   updateAdminProfile,
   updateProject
 } from './api';
+import { createTranslator, detectLang, pickText } from './i18n';
+
+const lang = detectLang();
+const t = createTranslator(lang);
+
+/** 取当前语言下的字段文本；英文页缺字段时回退到中文，避免出现空白 */
+function text(item, field) {
+  return pickText(item, field, lang);
+}
 
 const loading = ref(true);
 const error = ref('');
@@ -33,6 +42,10 @@ const profileForm = ref({
   title: '',
   summary: '',
   location: '',
+  fullNameEn: '',
+  titleEn: '',
+  summaryEn: '',
+  locationEn: '',
   email: '',
   githubUrl: '',
   linkedinUrl: ''
@@ -42,6 +55,8 @@ const projectForm = ref({
   name: '',
   url: '',
   description: '',
+  nameEn: '',
+  descriptionEn: '',
   highlight: false,
   displayOrder: 0
 });
@@ -53,6 +68,10 @@ function fillProfileForm(data) {
     title: data?.title || '',
     summary: data?.summary || '',
     location: data?.location || '',
+    fullNameEn: data?.fullNameEn || '',
+    titleEn: data?.titleEn || '',
+    summaryEn: data?.summaryEn || '',
+    locationEn: data?.locationEn || '',
     email: data?.email || '',
     githubUrl: data?.githubUrl || '',
     linkedinUrl: data?.linkedinUrl || ''
@@ -65,6 +84,8 @@ function resetProjectForm() {
     name: '',
     url: '',
     description: '',
+    nameEn: '',
+    descriptionEn: '',
     highlight: false,
     displayOrder: 0
   };
@@ -165,6 +186,8 @@ function startEditProject(item) {
     name: item.name,
     url: item.url,
     description: item.description,
+    nameEn: item.nameEn || '',
+    descriptionEn: item.descriptionEn || '',
     highlight: !!item.highlight,
     displayOrder: item.displayOrder ?? 0
   };
@@ -204,6 +227,10 @@ async function handleProjectDelete(id) {
 }
 
 onMounted(async () => {
+  // 让 <html lang> 和标题跟随语言，英文页才算「真正的英文页面」
+  document.documentElement.lang = t('htmlLang');
+  document.title = t('documentTitle');
+
   try {
     await loadPortfolioData();
     if (isAdminPage) {
@@ -219,14 +246,19 @@ onMounted(async () => {
 
 <template>
   <div class="background-glow"></div>
+
+  <nav class="lang-switch" v-if="!isAdminPage">
+    <a :href="lang === 'en' ? '/' : '/en'" :title="t('langSwitchTitle')">{{ t('langSwitch') }}</a>
+  </nav>
+
   <main class="page" v-if="!isAdminPage">
     <section class="hero card" v-if="!loading && profile">
-      <p class="tag">个人求职主页</p>
-      <h1>{{ profile.fullName }}</h1>
-      <h2>{{ profile.title }}</h2>
-      <p class="summary">{{ profile.summary }}</p>
+      <p class="tag">{{ t('brand') }}</p>
+      <h1>{{ text(profile, 'fullName') }}</h1>
+      <h2>{{ text(profile, 'title') }}</h2>
+      <p class="summary">{{ text(profile, 'summary') }}</p>
       <div class="meta">
-        <span v-if="profile.location">{{ profile.location }}</span>
+        <span v-if="text(profile, 'location')">{{ text(profile, 'location') }}</span>
         <a v-if="profile.email" :href="`mailto:${profile.email}`">{{ profile.email }}</a>
         <a v-if="profile.githubUrl" :href="profile.githubUrl" target="_blank" rel="noreferrer">GitHub</a>
         <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" rel="noreferrer">LinkedIn</a>
@@ -235,27 +267,27 @@ onMounted(async () => {
 
     <section class="card" v-if="!loading && projects.length">
       <div class="section-header">
-        <h3>项目展示</h3>
-        <p>未来你部署到云上的项目链接可持续追加在这里</p>
+        <h3>{{ t('projects') }}</h3>
+        <p>{{ t('projectsHint') }}</p>
       </div>
       <ul class="project-grid">
         <li class="project-item" v-for="item in projects" :key="item.id">
           <div class="project-title-wrap">
-            <h4>{{ item.name }}</h4>
-            <span v-if="item.highlight" class="badge">重点项目</span>
+            <h4>{{ text(item, 'name') }}</h4>
+            <span v-if="item.highlight" class="badge">{{ t('featured') }}</span>
           </div>
-          <p>{{ item.description }}</p>
-          <a :href="item.url" target="_blank" rel="noreferrer">查看项目</a>
+          <p>{{ text(item, 'description') }}</p>
+          <a :href="item.url" target="_blank" rel="noreferrer">{{ t('viewProject') }}</a>
         </li>
       </ul>
     </section>
 
     <section class="card state-card" v-if="loading">
-      正在加载你的个人主页...
+      {{ t('loading') }}
     </section>
 
     <section class="card state-card error" v-if="!loading && error">
-      {{ error }}，请检查后端服务和数据库连接。
+      {{ t('loadFailed') }}
     </section>
   </main>
 
@@ -306,13 +338,21 @@ onMounted(async () => {
         <section class="card">
           <h3>修改个人资料（profiles）</h3>
           <div class="form-grid">
-            <input class="input" v-model="profileForm.fullName" placeholder="姓名" />
-            <input class="input" v-model="profileForm.title" placeholder="职位标题" />
-            <input class="input" v-model="profileForm.location" placeholder="所在城市" />
+            <input class="input" v-model="profileForm.fullName" placeholder="姓名（中文版）" />
+            <input class="input" v-model="profileForm.title" placeholder="职位标题（中文版）" />
+            <input class="input" v-model="profileForm.location" placeholder="所在城市（中文版）" />
             <input class="input" v-model="profileForm.email" placeholder="邮箱" />
             <input class="input" v-model="profileForm.githubUrl" placeholder="GitHub 链接" />
             <input class="input" v-model="profileForm.linkedinUrl" placeholder="LinkedIn 链接" />
-            <textarea class="input textarea" v-model="profileForm.summary" placeholder="个人简介"></textarea>
+            <textarea class="input textarea" v-model="profileForm.summary" placeholder="个人简介（中文版）"></textarea>
+          </div>
+
+          <p class="form-section-label">English version（留空则英文页回退显示中文）</p>
+          <div class="form-grid">
+            <input class="input" v-model="profileForm.fullNameEn" placeholder="Full name (EN)" />
+            <input class="input" v-model="profileForm.titleEn" placeholder="Job title (EN)" />
+            <input class="input" v-model="profileForm.locationEn" placeholder="Location (EN)" />
+            <textarea class="input textarea" v-model="profileForm.summaryEn" placeholder="Summary (EN)"></textarea>
           </div>
           <button class="btn" @click="handleProfileSave">保存资料</button>
         </section>
@@ -352,7 +392,13 @@ onMounted(async () => {
               <input type="checkbox" v-model="projectForm.highlight" />
               <span>重点项目</span>
             </label>
-            <textarea class="input textarea" v-model="projectForm.description" placeholder="项目描述"></textarea>
+            <textarea class="input textarea" v-model="projectForm.description" placeholder="项目描述（中文版）"></textarea>
+          </div>
+
+          <p class="form-section-label">English version（留空则英文页回退显示中文）</p>
+          <div class="form-grid">
+            <input class="input" v-model="projectForm.nameEn" placeholder="Project name (EN)" />
+            <textarea class="input textarea" v-model="projectForm.descriptionEn" placeholder="Project description (EN)"></textarea>
           </div>
           <div class="actions">
             <button class="btn" @click="handleProjectSubmit">{{ editingProjectId ? '保存修改' : '添加项目' }}</button>

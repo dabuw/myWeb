@@ -57,25 +57,9 @@ export async function updateProject(password, id, project) {
 }
 
 export async function deleteProject(password, id) {
-  const response = await fetch(`${API_BASE}/api/admin/projects/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Admin-Password': password
-    }
+  return adminFetch(`/api/admin/projects/${id}`, password, {
+    method: 'DELETE'
   });
-
-  if (response.ok) {
-    return null;
-  }
-
-  if (response.status === 403 || response.status === 405) {
-    return adminFetch(`/api/admin/projects/${id}/delete`, password, {
-      method: 'POST'
-    });
-  }
-
-  throw new Error(`管理接口请求失败: ${response.status}`);
 }
 
 export async function changeAdminPassword(password, oldPassword, newPassword) {

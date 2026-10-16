@@ -16,7 +16,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
   color: var(--text-main);
   background: radial-gradient(circle at 12% -5%, #dff2ff 0%, transparent 40%),
     radial-gradient(circle at 92% 0%, #fff4d6 0%, transparent 33%),
@@ -40,7 +41,7 @@ body {
   z-index: 1;
   max-width: 960px;
   margin: 0 auto;
-  padding: 40px 16px 64px;
+  padding: 28px 16px 32px;
   display: grid;
   gap: 18px;
 }
@@ -56,7 +57,8 @@ body {
 
 .hero h1 {
   margin: 0;
-  font-family: 'Source Serif 4', Georgia, serif;
+  font-family: Georgia, 'Times New Roman', 'Songti SC', 'SimSun',
+    'Noto Serif CJK SC', serif;
   font-size: clamp(2rem, 4vw, 2.8rem);
 }
 
@@ -238,6 +240,68 @@ body {
 .error-text {
   margin: 8px 0 0;
   color: var(--danger);
+}
+
+/* 备案信息页脚：ICP 备案号必须悬挂在网站底部并链接到工信部备案系统 */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.site-footer a {
+  color: var(--text-sub);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* 语言切换入口（只在公开页渲染），放在内容上方右对齐，避免遮挡卡片 */
+.lang-switch {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 20px auto 0;
+  padding: 0 16px;
+  text-align: right;
+}
+
+.lang-switch a {
+  display: inline-block;
+  padding: 5px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+
+.lang-switch a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* 管理页里分隔「中文版 / 英文版」两组输入框 */
+.form-section-label {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  color: var(--text-sub);
+  font-size: 0.85rem;
 }
 
 @keyframes rise {

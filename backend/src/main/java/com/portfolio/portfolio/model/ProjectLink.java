@@ -30,6 +30,15 @@ public class ProjectLink {
     @Column(nullable = false)
     private Integer displayOrder = 0;
 
+    // --- English translations (nullable: the English page falls back to the
+    // Chinese value when a field is left empty) ---
+
+    @Column(length = 120)
+    private String nameEn;
+
+    @Column(length = 800)
+    private String descriptionEn;
+
     public Long getId() {
         return id;
     }
@@ -76,5 +85,21 @@ public class ProjectLink {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
+    public String getDescriptionEn() {
+        return descriptionEn;
+    }
+
+    public void setDescriptionEn(String descriptionEn) {
+        this.descriptionEn = descriptionEn;
     }
 }
