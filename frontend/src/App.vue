@@ -19,6 +19,29 @@ function text(item, field) {
   return pickText(item, field, lang);
 }
 
+/**
+ * 展示开关：数据库里为 NULL 时视为「显示」，兼容升级前的历史数据，
+ * 这样升级后内容不会突然消失；在管理页保存过之后就变成明确的 true/false。
+ * 开关为真只是「允许显示」，对应内容为空时依然不渲染。
+ */
+function isShown(item, flag) {
+  const value = item?.[flag];
+  return value === null || value === undefined ? true : !!value;
+}
+
+/** 联系方式区是否有任何一项要显示；全关时整块不渲染，避免留一片空白 */
+function hasAnyContact(item) {
+  if (!item) {
+    return false;
+  }
+  return (
+    (isShown(item, 'showLocation') && !!text(item, 'location')) ||
+    (isShown(item, 'showEmail') && !!item.email) ||
+    (isShown(item, 'showGithub') && !!item.githubUrl) ||
+    (isShown(item, 'showLinkedin') && !!item.linkedinUrl)
+  );
+}
+
 const loading = ref(true);
 const error = ref('');
 const profile = ref(null);
@@ -48,7 +71,12 @@ const profileForm = ref({
   locationEn: '',
   email: '',
   githubUrl: '',
-  linkedinUrl: ''
+  linkedinUrl: '',
+  // 展示开关
+  showLocation: true,
+  showEmail: true,
+  showGithub: true,
+  showLinkedin: true
 });
 
 const projectForm = ref({
@@ -74,7 +102,12 @@ function fillProfileForm(data) {
     locationEn: data?.locationEn || '',
     email: data?.email || '',
     githubUrl: data?.githubUrl || '',
-    linkedinUrl: data?.linkedinUrl || ''
+    linkedinUrl: data?.linkedinUrl || '',
+    // null / undefined 都视为勾选（兼容旧数据）
+    showLocation: data?.showLocation ?? true,
+    showEmail: data?.showEmail ?? true,
+    showGithub: data?.showGithub ?? true,
+    showLinkedin: data?.showLinkedin ?? true
   };
 }
 
@@ -257,11 +290,27 @@ onMounted(async () => {
       <h1>{{ text(profile, 'fullName') }}</h1>
       <h2>{{ text(profile, 'title') }}</h2>
       <p class="summary">{{ text(profile, 'summary') }}</p>
-      <div class="meta">
-        <span v-if="text(profile, 'location')">{{ text(profile, 'location') }}</span>
-        <a v-if="profile.email" :href="`mailto:${profile.email}`">{{ profile.email }}</a>
-        <a v-if="profile.githubUrl" :href="profile.githubUrl" target="_blank" rel="noreferrer">GitHub</a>
-        <a v-if="profile.linkedinUrl" :href="profile.linkedinUrl" target="_blank" rel="noreferrer">LinkedIn</a>
+      <div class="meta" v-if="hasAnyContact(profile)">
+        <span v-if="isShown(profile, 'showLocation') && text(profile, 'location')">
+          {{ text(profile, 'location') }}
+        </span>
+        <a v-if="isShown(profile, 'showEmail') && profile.email" :href="`mailto:${profile.email}`">
+          {{ profile.email }}
+        </a>
+        <a
+          v-if="isShown(profile, 'showGithub') && profile.githubUrl"
+          :href="profile.githubUrl"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub</a
+        >
+        <a
+          v-if="isShown(profile, 'showLinkedin') && profile.linkedinUrl"
+          :href="profile.linkedinUrl"
+          target="_blank"
+          rel="noreferrer"
+          >LinkedIn</a
+        >
       </div>
     </section>
 
@@ -337,6 +386,28 @@ onMounted(async () => {
 
         <section class="card">
           <h3>修改个人资料（profiles）</h3>
+
+          <p class="form-section-label">展示开关（勾选后才会在页面上显示；对应内容为空时仍然不显示）</p>
+          <div class="checkbox-row">
+            <label class="checkbox-wrap">
+              <input type="checkbox" v-model="profileForm.showLocation" />
+              <span>所在城市</span>
+            </label>
+            <label class="checkbox-wrap">
+              <input type="checkbox" v-model="profileForm.showEmail" />
+              <span>邮箱</span>
+            </label>
+            <label class="checkbox-wrap">
+              <input type="checkbox" v-model="profileForm.showGithub" />
+              <span>GitHub</span>
+            </label>
+            <label class="checkbox-wrap">
+              <input type="checkbox" v-model="profileForm.showLinkedin" />
+              <span>LinkedIn</span>
+            </label>
+          </div>
+
+          <p class="form-section-label">中文版</p>
           <div class="form-grid">
             <input class="input" v-model="profileForm.fullName" placeholder="姓名（中文版）" />
             <input class="input" v-model="profileForm.title" placeholder="职位标题（中文版）" />

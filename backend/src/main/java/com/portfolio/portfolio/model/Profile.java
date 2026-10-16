@@ -48,6 +48,23 @@ public class Profile {
     @Column(length = 120)
     private String locationEn;
 
+    // --- 展示开关：控制公开页显示哪些联系方式 ---
+    // 由管理页勾选。历史数据里这些列是 NULL，前端把 NULL 视为「显示」，
+    // 所以升级后内容不会突然消失；一旦在管理页保存过，就变成明确的 true/false。
+    // 注意：开关为真只是「允许显示」，对应内容为空时前端依然不渲染。
+
+    @Column(name = "show_location")
+    private Boolean showLocation;
+
+    @Column(name = "show_email")
+    private Boolean showEmail;
+
+    @Column(name = "show_github")
+    private Boolean showGithub;
+
+    @Column(name = "show_linkedin")
+    private Boolean showLinkedin;
+
     public Long getId() {
         return id;
     }
@@ -142,5 +159,37 @@ public class Profile {
 
     public void setLocationEn(String locationEn) {
         this.locationEn = locationEn;
+    }
+
+    public Boolean getShowLocation() {
+        return showLocation;
+    }
+
+    public void setShowLocation(Boolean showLocation) {
+        this.showLocation = showLocation;
+    }
+
+    public Boolean getShowEmail() {
+        return showEmail;
+    }
+
+    public void setShowEmail(Boolean showEmail) {
+        this.showEmail = showEmail;
+    }
+
+    public Boolean getShowGithub() {
+        return showGithub;
+    }
+
+    public void setShowGithub(Boolean showGithub) {
+        this.showGithub = showGithub;
+    }
+
+    public Boolean getShowLinkedin() {
+        return showLinkedin;
+    }
+
+    public void setShowLinkedin(Boolean showLinkedin) {
+        this.showLinkedin = showLinkedin;
     }
 }
