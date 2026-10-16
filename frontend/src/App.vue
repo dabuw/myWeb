@@ -42,6 +42,25 @@ function hasAnyContact(item) {
   );
 }
 
+/**
+ * 代码仓库链接的文字：按域名自动识别平台。
+ * 这样以后把仓库从 GitHub 换到 GitCode / Gitee，或者同时放几个，
+ * 标签都不会和实际地址对不上（不用改数据库、不用改配置）。
+ */
+function repoLabel(url) {
+  const target = (url || '').toLowerCase();
+  if (!target) {
+    return '';
+  }
+  if (target.includes('github.com')) return 'GitHub';
+  if (target.includes('gitcode.')) return 'GitCode';
+  if (target.includes('gitee.com')) return 'Gitee';
+  if (target.includes('gitlab')) return 'GitLab';
+  if (target.includes('bitbucket')) return 'Bitbucket';
+  if (target.includes('git.')) return 'Git';
+  return t('codeRepo');
+}
+
 const loading = ref(true);
 const error = ref('');
 const profile = ref(null);
@@ -303,7 +322,7 @@ onMounted(async () => {
           :href="profile.githubUrl"
           target="_blank"
           rel="noreferrer"
-          >GitHub</a
+          >{{ repoLabel(profile.githubUrl) }}</a
         >
         <a
           v-if="isShown(profile, 'showLinkedin') && profile.linkedinUrl"
@@ -400,7 +419,7 @@ onMounted(async () => {
             </label>
             <label class="checkbox-wrap">
               <input type="checkbox" v-model="profileForm.showGithub" />
-              <span>GitHub</span>
+              <span>代码仓库</span>
             </label>
             <label class="checkbox-wrap">
               <input type="checkbox" v-model="profileForm.showLinkedin" />
@@ -414,7 +433,11 @@ onMounted(async () => {
             <input class="input" v-model="profileForm.title" placeholder="职位标题（中文版）" />
             <input class="input" v-model="profileForm.location" placeholder="所在城市（中文版）" />
             <input class="input" v-model="profileForm.email" placeholder="邮箱" />
-            <input class="input" v-model="profileForm.githubUrl" placeholder="GitHub 链接" />
+            <input
+              class="input"
+              v-model="profileForm.githubUrl"
+              placeholder="代码仓库链接（GitHub / GitCode / Gitee）"
+            />
             <input class="input" v-model="profileForm.linkedinUrl" placeholder="LinkedIn 链接" />
             <textarea class="input textarea" v-model="profileForm.summary" placeholder="个人简介（中文版）"></textarea>
           </div>
