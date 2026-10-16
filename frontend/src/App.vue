@@ -339,14 +339,19 @@ onMounted(async () => {
         <h3>{{ t('projects') }}</h3>
         <p>{{ t('projectsHint') }}</p>
       </div>
-      <ul class="project-grid">
+      <!-- project-grid-public：公开页专属的悬停反馈样式挂在这个类上。
+           管理页的「项目列表」复用 .project-item，但那里的卡片不整体可点，
+           所以不能把 hover 效果写在 .project-item 上，否则管理页也会跟着变。 -->
+      <ul class="project-grid project-grid-public">
         <li class="project-item" v-for="item in projects" :key="item.id">
           <div class="project-title-wrap">
             <h4>{{ text(item, 'name') }}</h4>
             <span v-if="item.highlight" class="badge">{{ t('featured') }}</span>
           </div>
           <p>{{ text(item, 'description') }}</p>
-          <a :href="item.url" target="_blank" rel="noreferrer">{{ t('viewProject') }}</a>
+          <a class="project-link" :href="item.url" target="_blank" rel="noreferrer">{{
+            t('viewProject')
+          }}</a>
         </li>
       </ul>
     </section>

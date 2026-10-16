@@ -13,6 +13,14 @@
   box-sizing: border-box;
 }
 
+/* 键盘可见焦点环。浏览器默认的焦点环在浅色卡片上几乎看不见，
+   而这里的链接和按钮配色又很浅。只用 :focus-visible，
+   鼠标点击不会出现焦点环，键盘 Tab 才有。 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -137,6 +145,57 @@ body {
 .project-item p {
   margin: 8px 0;
   color: var(--text-sub);
+}
+
+/* 公开页项目卡片的交互反馈（管理页的「项目列表」复用 .project-item，
+   但它不是可点卡片，所以这些规则都挂在 .project-grid-public 下）。
+
+   设计取舍：卡片本身不做位移、不加 cursor: pointer、也不做「整卡可点」的
+   覆盖式热区——那会让人去点卡片空白处却发现没反应，比不做更糟。
+   悬停时卡片只做很轻的色调变化，同时把真正可点的按钮点亮，
+   把注意力引导到按钮上。 */
+.project-grid-public .project-item {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.project-grid-public .project-item:hover {
+  border-color: #b9c6d3;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+/* 选择器写到 .project-item 下，是为了盖过上面的「.meta a, .project-item a」 */
+.project-item .project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 7px 15px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #0b534d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+/* 箭头：说明点了会跳走，悬停时再往前走一点 */
+.project-item .project-link::after {
+  content: '→';
+  transition: transform 0.18s ease;
+}
+
+.project-grid-public .project-item:hover .project-link,
+.project-item .project-link:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.project-grid-public .project-item:hover .project-link::after,
+.project-item .project-link:focus-visible::after {
+  transform: translateX(3px);
 }
 
 .badge {
@@ -322,6 +381,20 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 系统开了「减弱动态效果」时，关掉入场动画和所有过渡。
+   不加这段的话，上面新增的悬停动画对这类用户照样会播。 */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }
 
