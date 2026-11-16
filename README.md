@@ -7,6 +7,12 @@
 - 管理密码校验（数据库 BCrypt + 后端接口级保护）
 - 本地开发与 Docker 部署
 
+## 界面预览
+
+![作品集首页](docs/screenshots/home.jpg)
+
+> 在线访问：<https://dabuw.online>
+
 ## 1. 技术栈
 
 - 后端：Spring Boot 3 + Spring Data JPA + MySQL
